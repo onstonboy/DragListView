@@ -563,7 +563,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     }
 
     public void scrollToItem(int column, int row, boolean animate) {
-        if (!isDragging() && mLists.size() > column && mLists.get(column).getAdapter().getItemCount() > row) {
+        if (mLists.size() > column && mLists.get(column).getAdapter().getItemCount() > row) {
             mScroller.forceFinished(true);
             scrollToColumn(column, animate);
             if (animate) {
@@ -628,6 +628,10 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
             mHeaders.remove(column);
             mLists.remove(column);
         }
+    }
+
+    public void itemDraggingChanged() {
+        mCurrentRecyclerView.itemDraggingChanged();
     }
 
     public boolean isDragEnabled() {

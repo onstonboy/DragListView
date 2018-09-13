@@ -139,6 +139,10 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
         return super.onInterceptTouchEvent(event);
     }
 
+    public void itemDraggingChanged() {
+        mDragState = DragState.DRAG_ENDED;
+    }
+
     void setDragEnabled(boolean enabled) {
         mDragEnabled = enabled;
     }
@@ -244,8 +248,10 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
         for (int i = count - 1; i >= 0; i--) {
             final View child = getChildAt(i);
             MarginLayoutParams params = (MarginLayoutParams) child.getLayoutParams();
-            if (x >= child.getLeft() - params.leftMargin && x <= child.getRight() + params.rightMargin
-                    && y >= child.getTop() - params.topMargin && y <= child.getBottom() + params.bottomMargin) {
+            if (x >= child.getLeft() - params.leftMargin
+                    && x <= child.getRight() + params.rightMargin
+                    && y >= child.getTop() - params.topMargin
+                    && y <= child.getBottom() + params.bottomMargin) {
                 return child;
             }
         }
@@ -255,11 +261,15 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
 
     private boolean shouldChangeItemPosition(int newPos) {
         // Check if drag position is changed and valid and that we are not in a hold position state
-        if (mHoldChangePosition || mDragItemPosition == NO_POSITION || mDragItemPosition == newPos) {
+        if (mHoldChangePosition
+                || mDragItemPosition == NO_POSITION
+                || mDragItemPosition == newPos) {
             return false;
         }
-        // If we are not allowed to drag above top or bottom and new pos is 0 or item count then return false
-        if ((mCanNotDragAboveTop && newPos == 0) || (mCanNotDragBelowBottom && newPos == mAdapter.getItemCount() - 1)) {
+        // If we are not allowed to drag above top or bottom and new pos is 0 or item count then
+        // return false
+        if ((mCanNotDragAboveTop && newPos == 0) || (mCanNotDragBelowBottom
+                && newPos == mAdapter.getItemCount() - 1)) {
             return false;
         }
         // Check with callback if we are allowed to drop at this position
