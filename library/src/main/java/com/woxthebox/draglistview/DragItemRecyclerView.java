@@ -110,8 +110,10 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
                 for (int i = 0; i < parent.getChildCount(); i++) {
                     View item = parent.getChildAt(i);
                     int pos = getChildAdapterPosition(item);
-                    if (pos != NO_POSITION && mAdapter.getItemId(pos) == mAdapter.getDropTargetId()) {
-                        drawable.setBounds(item.getLeft(), item.getTop(), item.getRight(), item.getBottom());
+                    if (pos != NO_POSITION
+                            && mAdapter.getItemId(pos) == mAdapter.getDropTargetId()) {
+                        drawable.setBounds(item.getLeft(), item.getTop(), item.getRight(),
+                                item.getBottom());
                         drawable.draw(c);
                     }
                 }
@@ -287,18 +289,24 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
             return;
         }
 
-        // If using a LinearLayoutManager and the new view has a bigger height we need to check if passing centerY as well.
-        // If not doing this extra check the bigger item will move back again when dragging slowly over it.
-        boolean linearLayoutManager = getLayoutManager() instanceof LinearLayoutManager && !(getLayoutManager() instanceof GridLayoutManager);
+        // If using a LinearLayoutManager and the new view has a bigger height we need to check
+        // if passing centerY as well.
+        // If not doing this extra check the bigger item will move back again when dragging
+        // slowly over it.
+        boolean linearLayoutManager = getLayoutManager() instanceof LinearLayoutManager
+                && !(getLayoutManager() instanceof GridLayoutManager);
         if (linearLayoutManager) {
             MarginLayoutParams params = (MarginLayoutParams) view.getLayoutParams();
             int viewHeight = view.getMeasuredHeight() + params.topMargin + params.bottomMargin;
             int viewCenterY = view.getTop() - params.topMargin + viewHeight / 2;
             boolean dragDown = mDragItemPosition < getChildLayoutPosition(view);
-            boolean movedPassedCenterY = dragDown ? mDragItem.getY() > viewCenterY : mDragItem.getY() < viewCenterY;
+            boolean movedPassedCenterY =
+                    dragDown ? mDragItem.getY() > viewCenterY : mDragItem.getY() < viewCenterY;
 
-            // If new height is bigger then current and not passed centerY then reset back to current position
-            if (viewHeight > mDragItem.getDragItemView().getMeasuredHeight() && !movedPassedCenterY) {
+            // If new height is bigger then current and not passed centerY then reset back to
+            // current position
+            if (viewHeight > mDragItem.getDragItemView().getMeasuredHeight()
+                    && !movedPassedCenterY) {
                 newPos = mDragItemPosition;
             }
         }
@@ -314,7 +322,8 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
                 mAdapter.changeItemPosition(mDragItemPosition, newPos);
                 mDragItemPosition = newPos;
 
-                // Since notifyItemMoved scrolls the list we need to scroll back to where we were after the position change.
+                // Since notifyItemMoved scrolls the list we need to scroll back to where we were
+                // after the position change.
                 if (layoutManager.getOrientation() == LinearLayoutManager.VERTICAL) {
                     int topMargin = ((MarginLayoutParams) posView.getLayoutParams()).topMargin;
                     layoutManager.scrollToPositionWithOffset(pos, posView.getTop() - topMargin);
@@ -373,8 +382,9 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
 
     boolean startDrag(View itemView, long itemId, float x, float y) {
         int dragItemPosition = mAdapter.getPositionForItemId(itemId);
-        if (!mDragEnabled || (mCanNotDragAboveTop && dragItemPosition == 0)
-                || (mCanNotDragBelowBottom && dragItemPosition == mAdapter.getItemCount() - 1)) {
+        if (!mDragEnabled || (mCanNotDragAboveTop && dragItemPosition == 0) || (
+                mCanNotDragBelowBottom
+                        && dragItemPosition == mAdapter.getItemCount() - 1)) {
             return false;
         }
 
@@ -441,8 +451,10 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
         post(new Runnable() {
             @Override
             public void run() {
-                // Sometimes the holder will be null if a holder has not yet been set for the position
-                final RecyclerView.ViewHolder holder = findViewHolderForAdapterPosition(mDragItemPosition);
+                // Sometimes the holder will be null if a holder has not yet been set for the
+                // position
+                final RecyclerView.ViewHolder holder =
+                        findViewHolderForAdapterPosition(mDragItemPosition);
                 if (holder != null) {
                     getItemAnimator().endAnimation(holder);
                     mDragItem.endDrag(holder.itemView, new AnimatorListenerAdapter() {
@@ -460,12 +472,13 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
     }
 
     private void onDragItemAnimationEnd() {
-        if (!mItemDraggingChanged) {
-            mAdapter.setDragItemId(NO_ID);
-            mAdapter.setDropTargetId(NO_ID);
-            mAdapter.notifyDataSetChanged();
+        if (mItemDraggingChanged) {
+            mAdapter.removeItem(mDragItemPosition);
         }
         mItemDraggingChanged = false;
+        mAdapter.setDragItemId(NO_ID);
+        mAdapter.setDropTargetId(NO_ID);
+        mAdapter.notifyDataSetChanged();
         mDragState = DragState.DRAG_ENDED;
         if (mListener != null) {
             mListener.onDragEnded(mDragItemPosition);
