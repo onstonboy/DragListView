@@ -68,6 +68,7 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
     private boolean mScrollingEnabled = true;
     private boolean mDisableReorderWhenDragging;
     private boolean mDragEnabled = true;
+    private boolean mItemDraggingChanged;
 
     public DragItemRecyclerView(Context context) {
         super(context);
@@ -140,7 +141,7 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
     }
 
     public void itemDraggingChanged() {
-        mDragState = DragState.DRAG_ENDED;
+        mItemDraggingChanged = true;
     }
 
     void setDragEnabled(boolean enabled) {
@@ -459,10 +460,12 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
     }
 
     private void onDragItemAnimationEnd() {
-        mAdapter.setDragItemId(NO_ID);
-        mAdapter.setDropTargetId(NO_ID);
-        mAdapter.notifyDataSetChanged();
-
+        if (!mItemDraggingChanged) {
+            mAdapter.setDragItemId(NO_ID);
+            mAdapter.setDropTargetId(NO_ID);
+            mAdapter.notifyDataSetChanged();
+        }
+        mItemDraggingChanged = false;
         mDragState = DragState.DRAG_ENDED;
         if (mListener != null) {
             mListener.onDragEnded(mDragItemPosition);
