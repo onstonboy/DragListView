@@ -31,10 +31,13 @@ Step 2. Add the dependency
 dependencies {
     implementation 'com.github.daolq3012:DragListView:2.0.1'
 }
+```
 
 Add this to proguard rules, otherwise animations won't work correctly
 
+```groovy
     -keep class com.woxthebox.draglistview.** { *; }
+```
 
 ## Usage
 List and Grid layouts are used as example in the sample project.
