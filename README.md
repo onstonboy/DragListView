@@ -1,4 +1,4 @@
-# DragListView
+# DragListView - Can Add/Remove when dragging
 DragListView can be used when you want to be able to re-order items in a list, grid or a board.
 It also supports horizontal swiping of items in a list.
 
@@ -14,13 +14,23 @@ YouTube demo video<br>
 
 ## Download lib with gradle
 
-    repositories {
-        mavenCentral()
-    }
+Step 1. Add it in your root build.gradle at the end of repositories:
 
-    dependencies {
-        compile 'com.github.woxthebox:draglistview:1.6.2'
+```groovy
+  allprojects {
+    repositories {
+    	...
+    maven { url 'https://jitpack.io' }
     }
+  }
+```
+
+Step 2. Add the dependency
+
+```groovy
+dependencies {
+    implementation 'com.github.daolq3012:DragListView:1.0'
+}
 
 Add this to proguard rules, otherwise animations won't work correctly
 
