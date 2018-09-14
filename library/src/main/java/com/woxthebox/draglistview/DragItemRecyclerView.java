@@ -475,7 +475,6 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
         if (mItemDraggingChanged) {
             mAdapter.removeItem(mDragItemPosition);
         }
-        mItemDraggingChanged = false;
         mAdapter.setDragItemId(NO_ID);
         mAdapter.setDropTargetId(NO_ID);
         mAdapter.notifyDataSetChanged();
@@ -511,6 +510,8 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
 
     void addDragItemAndStart(float y, Object item, long itemId) {
         int pos = getDragPositionForY(y);
+
+        mItemDraggingChanged = false;
 
         mDragState = DragState.DRAG_STARTED;
         mDragItemId = itemId;
