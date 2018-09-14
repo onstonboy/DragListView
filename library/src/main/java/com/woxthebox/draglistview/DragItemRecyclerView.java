@@ -473,6 +473,7 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
 
     private void onDragItemAnimationEnd() {
         if (mItemDraggingChanged) {
+            mItemDraggingChanged = false;
             mAdapter.removeItem(mDragItemPosition);
         }
         mAdapter.setDragItemId(NO_ID);
