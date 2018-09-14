@@ -136,6 +136,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     private int mLastDragColumn = NO_POSITION;
     private int mLastDragRow = NO_POSITION;
     private SavedState mSavedState;
+    private boolean mItemDraggingChanged;
 
     public BoardView(Context context) {
         super(context);
@@ -348,7 +349,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
                     Object item = mCurrentRecyclerView.removeDragItemAndEnd();
                     if (item != null) {
                         mCurrentRecyclerView = currentList;
-                        mCurrentRecyclerView.addDragItemAndStart(getRelativeViewTouchY(mCurrentRecyclerView), item, itemId);
+                        mCurrentRecyclerView.addDragItemAndStart(getRelativeViewTouchY(mCurrentRecyclerView), item, itemId, mItemDraggingChanged);
                         mDragItem.setOffset(((View) mCurrentRecyclerView.getParent()).getLeft(), mCurrentRecyclerView.getTop());
 
                         if (mBoardListener != null) {
@@ -631,6 +632,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     }
 
     public void itemDraggingChanged() {
+        mItemDraggingChanged = true;
         mCurrentRecyclerView.itemDraggingChanged();
     }
 
@@ -873,6 +875,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
             public void onDragEnded(int newItemPosition) {
                 mLastDragColumn = NO_POSITION;
                 mLastDragRow = NO_POSITION;
+                mItemDraggingChanged = false;
                 if (mBoardListener != null) {
                     mBoardListener.onItemDragEnded(mDragStartColumn, mDragStartRow, getColumnOfList(recyclerView), newItemPosition);
                 }

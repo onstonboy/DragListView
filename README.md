@@ -29,7 +29,7 @@ Step 2. Add the dependency
 
 ```groovy
 dependencies {
-    implementation 'com.github.daolq3012:DragListView:2.0.7'
+    implementation 'com.github.daolq3012:DragListView:2.1'
 }
 ```
 
