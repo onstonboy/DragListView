@@ -80,6 +80,11 @@ public class DragListView extends FrameLayout {
 
     public DragListView(Context context) {
         super(context);
+        mDragItem = new DragItem(getContext());
+        mRecyclerView = createRecyclerView();
+        mRecyclerView.setDragItem(mDragItem);
+        addView(mRecyclerView);
+        addView(mDragItem.getDragItemView());
     }
 
     public DragListView(Context context, AttributeSet attrs) {
