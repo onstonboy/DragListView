@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 25)
 public class BoardViewTest {
-    private BoardView subject;
+    private BoardViewVertical subject;
     private DragItemAdapter adapter;
     private long firstItemId;
 
@@ -39,7 +39,7 @@ public class BoardViewTest {
         adapter = mock(DragItemAdapter.class);
         when(adapter.hasStableIds()).thenReturn(true);
 
-        subject = new BoardView(RuntimeEnvironment.application);
+        subject = new BoardViewVertical(RuntimeEnvironment.application);
         subject.onFinishInflate();
     }
 
@@ -57,7 +57,7 @@ public class BoardViewTest {
 
     @Test
     public void columnDragging_whenDraggingItem_callsOnDragItemChangedPosition() {
-        BoardView.BoardListener boardListener = mock(BoardView.BoardListener.class);
+        BoardViewVertical.BoardListener boardListener = mock(BoardViewVertical.BoardListener.class);
         subject.setBoardListener(boardListener);
 
         createColumnsAndDrag(adapter);
@@ -68,7 +68,7 @@ public class BoardViewTest {
     @Test
     public void columnDragging_whenDraggingItem_whenItemPositionChanges_callsOnDragItemChangedPosition() {
         int firstItemPosition = 3;
-        BoardView.BoardListener boardListener = mock(BoardView.BoardListener.class);
+        BoardViewVertical.BoardListener boardListener = mock(BoardViewVertical.BoardListener.class);
         subject.setBoardListener(boardListener);
         DragItemRecyclerView column = createColumnsAndDrag(adapter);
         reset(boardListener);
