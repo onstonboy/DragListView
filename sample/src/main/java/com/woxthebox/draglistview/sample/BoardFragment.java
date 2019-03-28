@@ -38,14 +38,16 @@ import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.woxthebox.draglistview.BoardView;
+import com.woxthebox.draglistview.BoardViewVertical;
 import com.woxthebox.draglistview.DragItem;
 
+import com.woxthebox.draglistview.DragItemVertical;
 import java.util.ArrayList;
 
 public class BoardFragment extends Fragment {
 
     private static int sCreatedItems = 0;
-    private BoardView mBoardView;
+    private BoardViewVertical mBoardView;
     private int mColumns;
 
     public static BoardFragment newInstance() {
@@ -69,8 +71,8 @@ public class BoardFragment extends Fragment {
         mBoardView.setCustomDragItem(new MyDragItem(getActivity(), R.layout.column_item));
         mBoardView.setCustomColumnDragItem(new MyColumnDragItem(getActivity(), R.layout.column_drag_layout));
         mBoardView.setSnapToColumnInLandscape(false);
-        mBoardView.setColumnSnapPosition(BoardView.ColumnSnapPosition.CENTER);
-        mBoardView.setBoardListener(new BoardView.BoardListener() {
+        mBoardView.setColumnSnapPosition(BoardViewVertical.ColumnSnapPosition.CENTER);
+        mBoardView.setBoardListener(new BoardViewVertical.BoardListener() {
             @Override
             public void onItemDragStarted(int column, int row) {
                 //Toast.makeText(getContext(), "Start - column: " + column + " row: " + row, Toast.LENGTH_SHORT).show();
@@ -116,7 +118,7 @@ public class BoardFragment extends Fragment {
                 //Toast.makeText(getContext(), "Column drag ended at " + position, Toast.LENGTH_SHORT).show();
             }
         });
-        mBoardView.setBoardCallback(new BoardView.BoardCallback() {
+        mBoardView.setBoardCallback(new BoardViewVertical.BoardCallback() {
             @Override
             public boolean canDragItemAtPosition(int column, int dragPosition) {
                 // Add logic here to prevent an item to be dragged
@@ -184,7 +186,7 @@ public class BoardFragment extends Fragment {
 
     private void addColumn() {
         final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
-        int addItems = 15;
+        int addItems = 2;
         for (int i = 0; i < addItems; i++) {
             long id = sCreatedItems++;
             mItemArray.add(new Pair<>(id, "Item " + id));
@@ -212,7 +214,7 @@ public class BoardFragment extends Fragment {
         mColumns++;
     }
 
-    private static class MyColumnDragItem extends DragItem {
+    private static class MyColumnDragItem extends DragItemVertical {
 
         MyColumnDragItem(Context context, int layoutId) {
             super(context, layoutId);
@@ -259,7 +261,7 @@ public class BoardFragment extends Fragment {
         }
     }
 
-    private static class MyDragItem extends DragItem {
+    private static class MyDragItem extends DragItemVertical {
 
         MyDragItem(Context context, int layoutId) {
             super(context, layoutId);

@@ -162,7 +162,8 @@ public class DragItemVertical {
         float endX =
                 endToView.getX() - (mDragView.getMeasuredWidth() - endToView.getMeasuredWidth()) / 2
                         + mDragView.getMeasuredWidth() / 2;
-        float endY = mDragView.getY();
+        float endY = endToView.getY() - (mDragView.getMeasuredHeight() - endToView.getMeasuredHeight()) / 2 + mDragView
+                .getMeasuredHeight() / 2;
         PropertyValuesHolder pvhX = PropertyValuesHolder.ofFloat("X", mPosX, endX);
         PropertyValuesHolder pvhY = PropertyValuesHolder.ofFloat("Y", mPosY, endY);
         ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(this, pvhX, pvhY);
