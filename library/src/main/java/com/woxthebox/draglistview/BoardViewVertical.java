@@ -971,7 +971,7 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
 
         LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setLayoutParams(new LayoutParams(mColumnWidth, LayoutParams.MATCH_PARENT));
+        layout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         View columnHeader = header;
         if (header == null) {
             columnHeader = new View(getContext());
