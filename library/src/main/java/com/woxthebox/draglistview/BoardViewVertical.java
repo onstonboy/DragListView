@@ -300,12 +300,9 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
             // then update the drag item position to prevent stuttering item
             if (mAutoScroller.isAutoScrolling() && isDragging()) {
                 if (isDraggingColumn()) {
-                    mDragColumn.setPosition(mTouchY + getScrollY() - mDragColumnStartScrollY,
-                            mTouchY);
+                    mDragColumn.setPosition(mTouchX, mTouchY + getScrollY() - mDragColumnStartScrollY);
                 } else {
-                    mDragItem.setPosition(
-                            getRelativeViewTouchX((View) mCurrentRecyclerView.getParent()),
-                            getRelativeViewTouchY(mCurrentRecyclerView));
+                    mDragItem.setPosition(getRelativeViewTouchX(mCurrentRecyclerView), getRelativeViewTouchY((View) mCurrentRecyclerView.getParent()));
                 }
             }
 
@@ -346,7 +343,7 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
             }
             // Need to subtract with scrollX at the beginning of the column drag because of how
             // drag item position is calculated
-            mDragColumn.setPosition(mTouchX + getScrollX() - mDragColumnStartScrollX, mTouchY);
+            mDragColumn.setPosition(mTouchX, mTouchY + getScrollY() - mDragColumnStartScrollY);
         } else {
             // Updated event to scrollview coordinates
             if (mCurrentRecyclerView != currentList) {
@@ -363,10 +360,10 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
                     if (item != null) {
                         mCurrentRecyclerView = currentList;
                         mCurrentRecyclerView.addDragItemAndStart(
-                                getRelativeViewTouchY(mCurrentRecyclerView), item, itemId,
+                                getRelativeViewTouchY(((View) mCurrentRecyclerView.getParent())), item, itemId,
                                 mItemDraggingChanged);
-                        mDragItem.setOffset(((View) mCurrentRecyclerView.getParent()).getLeft(),
-                                mCurrentRecyclerView.getTop());
+                        mDragItem.setOffset(mCurrentRecyclerView.getLeft(),
+                                ((View)mCurrentRecyclerView.getParent()).getTop());
 
                         if (mBoardListener != null) {
                             mBoardListener.onItemChangedColumn(oldColumn, newColumn);
@@ -378,7 +375,7 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
             // Updated event to list coordinates
             mCurrentRecyclerView.onDragging(
                     getRelativeViewTouchX((View) mCurrentRecyclerView.getParent()),
-                    getRelativeViewTouchY(mCurrentRecyclerView));
+                    getRelativeViewTouchY((View) mCurrentRecyclerView.getParent()));
         }
 
         boolean isPortrait =
@@ -396,7 +393,7 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
     }
 
     private float getRelativeViewTouchX(View view) {
-        return mTouchX + getScrollX() - view.getLeft();
+        return mTouchX - view.getLeft();
     }
 
     private float getRelativeViewTouchY(View view) {
@@ -424,11 +421,11 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
         return column;
     }
 
-    private int getCurrentColumn(float posX) {
+    private int getCurrentColumn(float posY) {
         for (int i = 0; i < mLists.size(); i++) {
             RecyclerView list = mLists.get(i);
             View parent = (View) list.getParent();
-            if (parent.getLeft() <= posX && parent.getRight() > posX) {
+            if (parent.getTop() <= posY && parent.getBottom() > posY) {
                 return i;
             }
         }
@@ -909,8 +906,8 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
                 mDragStartRow = itemPosition;
                 mCurrentRecyclerView = recyclerView;
                 //Set position Y dragItem draw
-                mDragItem.setOffset(((View) mCurrentRecyclerView.getParent()).getX(),
-                        mCurrentRecyclerView.getY());
+                mDragItem.setOffset(mCurrentRecyclerView.getX(),
+                        ((View) mCurrentRecyclerView.getParent()).getY());
                 if (mBoardListener != null) {
                     mBoardListener.onItemDragStarted(mDragStartColumn, mDragStartRow);
                 }
@@ -962,8 +959,8 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
             @Override
             public boolean startDrag(View itemView, long itemId) {
                 return recyclerView.startDrag(itemView, itemId,
-                        getRelativeViewTouchX((View) recyclerView.getParent()),
-                        getRelativeViewTouchY(recyclerView));
+                        getRelativeViewTouchX(recyclerView),
+                        getRelativeViewTouchY((View) recyclerView.getParent()));
             }
 
             @Override
