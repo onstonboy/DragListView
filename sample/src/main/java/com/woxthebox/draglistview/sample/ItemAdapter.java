@@ -16,25 +16,29 @@
 
 package com.woxthebox.draglistview.sample;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.woxthebox.draglistview.DragItemAdapter;
-
 import java.util.ArrayList;
 
-class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter.ViewHolder> {
+class ItemAdapter extends DragItemAdapter<Pair<Long, String>, RecyclerView.ViewHolder> {
+    private static int ITEM1 = 0;
+    private static int ITEM2 = 1;
 
     private int mLayoutId;
     private int mGrabHandleId;
     private boolean mDragOnLongPress;
 
-    ItemAdapter(ArrayList<Pair<Long, String>> list, int layoutId, int grabHandleId, boolean dragOnLongPress) {
+    ItemAdapter(ArrayList<Pair<Long, String>> list, int layoutId, int grabHandleId,
+            boolean dragOnLongPress) {
         mLayoutId = layoutId;
         mGrabHandleId = grabHandleId;
         mDragOnLongPress = dragOnLongPress;
@@ -43,17 +47,47 @@ class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter.ViewHo
 
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(mLayoutId, parent, false);
-        return new ViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == ITEM1) {
+            View view = LayoutInflater.from(parent.getContext()).inflate(mLayoutId, parent, false);
+            return new ViewHolder(view);
+        } else {
+            View view = LayoutInflater.from(parent.getContext()).inflate(mLayoutId, parent, false);
+            return new ViewHolder2(view);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         super.onBindViewHolder(holder, position);
-        String text = mItemList.get(position).second;
-        holder.mText.setText(text);
-        holder.itemView.setTag(mItemList.get(position));
+        if (holder instanceof ViewHolder) {
+            String text = mItemList.get(position).second;
+            ((ViewHolder) holder).mText.setText(text);
+            if (text.equals("con")) {
+                FrameLayout.LayoutParams params =
+                        (FrameLayout.LayoutParams) ((ViewHolder) holder).mContainer
+                                .getLayoutParams();
+                params.setMargins(100, 0, 0, 0);
+                ((ViewHolder) holder).mContainer.setLayoutParams(params);
+            } else {
+                FrameLayout.LayoutParams params =
+                        (FrameLayout.LayoutParams) ((ViewHolder) holder).mContainer
+                                .getLayoutParams();
+                params.setMargins(0, 0, 0, 0);
+                ((ViewHolder) holder).mContainer.setLayoutParams(params);
+            }
+            holder.itemView.setTag(mItemList.get(position));
+        } else {
+            ((ViewHolder2) holder).bind(mItemList.get(position));
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        if (mItemList.get(position).second.equals("group")) {
+            return ITEM2;
+        }
+        return ITEM1;
     }
 
     @Override
@@ -61,12 +95,34 @@ class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter.ViewHo
         return mItemList.get(position).first;
     }
 
+    public void updateChildTask(int position) {
+        if (mItemList.size() - 1 >= position && position >= 0) {
+            long id = mItemList.get(position).first;
+            mItemList.remove(position);
+            mItemList.add(position, new Pair(id, "con"));
+            notifyDataSetChanged();
+        }
+    }
+
+    public void updateParentTask(int position) {
+        if (mItemList.size() - 1 >= position && position >= 0) {
+            long id = mItemList.get(position).first;
+            mItemList.remove(position);
+            mItemList.add(position, new Pair(id, "cha"));
+            notifyDataSetChanged();
+        }
+    }
+
     class ViewHolder extends DragItemAdapter.ViewHolder {
+        Context mContext;
         TextView mText;
+        View mContainer;
 
         ViewHolder(final View itemView) {
             super(itemView, mGrabHandleId, mDragOnLongPress);
             mText = (TextView) itemView.findViewById(R.id.text);
+            mContainer = (View) itemView.findViewById(R.id.card);
+            mContext = itemView.getContext();
         }
 
         @Override
@@ -78,6 +134,23 @@ class ItemAdapter extends DragItemAdapter<Pair<Long, String>, ItemAdapter.ViewHo
         public boolean onItemLongClicked(View view) {
             Toast.makeText(view.getContext(), "Item long clicked", Toast.LENGTH_SHORT).show();
             return true;
+        }
+    }
+
+    class ViewHolder2 extends DragItemAdapter.ViewHolder {
+        Context mContext;
+        TextView mText;
+        View mContainer;
+
+        public ViewHolder2(View itemView) {
+            super(itemView, mGrabHandleId, mDragOnLongPress);
+            mText = (TextView) itemView.findViewById(R.id.text);
+            mContainer = (View) itemView.findViewById(R.id.card);
+            mContext = itemView.getContext();
+        }
+
+        public void bind(Pair<Long, String> longStringPair) {
+            mText.setText(longStringPair.second);
         }
     }
 }

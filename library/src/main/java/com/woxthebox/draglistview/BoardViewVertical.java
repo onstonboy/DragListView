@@ -59,6 +59,10 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
 
         void onItemChangedColumn(int oldColumn, int newColumn);
 
+        void onItemChangeToChild(int position, int currentColumn);
+
+        void onItemChangeToParent(int position, int currentColumn);
+
         void onFocusedColumnChanged(int oldColumn, int newColumn);
 
         void onColumnDragStarted(int position);
@@ -83,6 +87,14 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
 
         @Override
         public void onItemChangedColumn(int oldColumn, int newColumn) {
+        }
+
+        @Override
+        public void onItemChangeToChild(int position, int currentColumn) {
+        }
+
+        @Override
+        public void onItemChangeToParent(int position, int currentColumn) {
         }
 
         @Override
@@ -300,9 +312,13 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
             // then update the drag item position to prevent stuttering item
             if (mAutoScroller.isAutoScrolling() && isDragging()) {
                 if (isDraggingColumn()) {
-                    mDragColumn.setPosition(mTouchX, mTouchY + getScrollY() - mDragColumnStartScrollY);
+                    mDragColumn.setPosition(mTouchX,
+                            mTouchY + getScrollY() - mDragColumnStartScrollY);
                 } else {
-                    mDragItem.setPosition(getRelativeViewTouchX(mCurrentRecyclerView), getRelativeViewTouchY((View) mCurrentRecyclerView.getParent()));
+                    //                    mDragItem.setPosition(getRelativeViewTouchX
+                    // (mCurrentRecyclerView),
+                    //                            getRelativeViewTouchY((View)
+                    // mCurrentRecyclerView.getParent()));
                 }
             }
 
@@ -360,11 +376,10 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
                     if (item != null) {
                         mCurrentRecyclerView = currentList;
                         mCurrentRecyclerView.addDragItemAndStart(
-                                getRelativeViewTouchY(((View) mCurrentRecyclerView.getParent())), item, itemId,
-                                mItemDraggingChanged);
+                                getRelativeViewTouchY(((View) mCurrentRecyclerView.getParent())),
+                                item, itemId, mItemDraggingChanged);
                         mDragItem.setOffset(mCurrentRecyclerView.getLeft(),
-                                ((View)mCurrentRecyclerView.getParent()).getTop());
-
+                                ((View) mCurrentRecyclerView.getParent()).getTop());
                         if (mBoardListener != null) {
                             mBoardListener.onItemChangedColumn(oldColumn, newColumn);
                         }
@@ -403,7 +418,7 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
     private DragItemVerticalRecyclerView getCurrentRecyclerView(float y) {
         for (DragItemVerticalRecyclerView list : mLists) {
             View parent = (View) list.getParent();
-            if (parent.getTop() <= y && parent.getBottom() >= y) {
+            if (parent.getTop() <= y && parent.getBottom() > y) {
                 return list;
             }
         }
@@ -817,11 +832,9 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
                     int oldLeft, int oldTop, int oldRight, int oldBottom) {
                 mColumnLayout.removeOnLayoutChangeListener(this);
                 if (fromIndex > toIndex) {
-                    column2.setTranslationY(
-                            column2.getTranslationY() + column1.getTop() - column1.getBottom());
+                    column2.setTranslationY(column1.getTop() - column1.getBottom());
                 } else {
-                    column2.setTranslationY(
-                            column2.getTranslationY() + column1.getTop() - column2.getTop());
+                    column2.setTranslationY(column1.getTop() - column2.getTop());
                 }
                 column2.animate().translationY(0).setDuration(350).start();
             }
@@ -952,14 +965,25 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
                         mDragStartColumn, mDragStartRow, column, dropPosition);
             }
         });
+        recyclerView.setDragItemToChildItemListener(
+                new DragItemVerticalRecyclerView.DragItemToChildItemListener() {
+                    @Override
+                    public void onDragToChildTask(int itemPosition) {
+                        mBoardListener.onItemChangeToChild(itemPosition, mCurrentColumn);
+                    }
+
+                    @Override
+                    public void onDragToParentTask(int itemPosition) {
+                        mBoardListener.onItemChangeToParent(itemPosition, mCurrentColumn);
+                    }
+                });
 
         recyclerView.setAdapter(adapter);
         recyclerView.setDragEnabled(mDragEnabled);
         adapter.setDragStartedListener(new DragItemAdapter.DragStartCallback() {
             @Override
             public boolean startDrag(View itemView, long itemId) {
-                return recyclerView.startDrag(itemView, itemId,
-                        getRelativeViewTouchX(recyclerView),
+                return recyclerView.startDrag(itemView, itemId, getRelativeViewTouchX(recyclerView),
                         getRelativeViewTouchY((View) recyclerView.getParent()));
             }
 
@@ -971,14 +995,15 @@ public class BoardViewVertical extends ScrollView implements AutoScroller.AutoSc
 
         LinearLayout layout = new LinearLayout(getContext());
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setLayoutParams(new LayoutParams(mColumnWidth, LayoutParams.MATCH_PARENT));
+        layout.setLayoutParams(
+                new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         View columnHeader = header;
         if (header == null) {
             columnHeader = new View(getContext());
             columnHeader.setVisibility(View.GONE);
         }
         layout.addView(columnHeader);
-        mHeaders.add(columnHeader);
+        mHeaders.add(index, columnHeader);
 
         layout.addView(recyclerView);
 

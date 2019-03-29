@@ -25,6 +25,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -45,6 +46,12 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
         boolean canDropItemAtPosition(int dropPosition);
     }
 
+    public interface DragItemToChildItemListener {
+        void onDragToChildTask(int itemPosition);
+
+        void onDragToParentTask(int itemPosition);
+    }
+
     private enum DragState {
         DRAG_STARTED, DRAGGING, DRAG_ENDED
     }
@@ -52,6 +59,7 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
     private AutoScroller mAutoScroller;
     private DragItemListener mListener;
     private DragItemCallback mDragCallback;
+    private DragItemToChildItemListener mDragItemToChildItemListener;
     private DragState mDragState = DragState.DRAG_ENDED;
     private DragItemAdapter mAdapter;
     private DragItemVertical mDragItem;
@@ -182,6 +190,10 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
 
     void setDragItemCallback(DragItemCallback callback) {
         mDragCallback = callback;
+    }
+
+    void setDragItemToChildItemListener(DragItemToChildItemListener dragItemToChildItemListener) {
+        mDragItemToChildItemListener = dragItemToChildItemListener;
     }
 
     void setDragItem(DragItemVertical dragItem) {
@@ -458,6 +470,11 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
                         findViewHolderForAdapterPosition(mDragItemPosition);
                 if (holder != null) {
                     getItemAnimator().endAnimation(holder);
+                    if (mDragItem.getDragItemView().getX() > mDragItem.getRealDragView().getWidth() / 6) {
+                        mDragItemToChildItemListener.onDragToChildTask(mDragItemPosition);
+                    } else {
+                        mDragItemToChildItemListener.onDragToParentTask(mDragItemPosition);
+                    }
                     mDragItem.endDrag(holder.itemView, new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
