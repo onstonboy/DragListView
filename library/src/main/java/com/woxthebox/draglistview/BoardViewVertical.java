@@ -35,15 +35,14 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Scroller;
 import java.util.ArrayList;
 
 import static android.support.v7.widget.RecyclerView.NO_POSITION;
 
-public class BoardViewVertical extends HorizontalScrollView
-        implements AutoScroller.AutoScrollListener {
+public class BoardViewVertical extends ScrollView implements AutoScroller.AutoScrollListener {
 
     public interface BoardCallback {
         boolean canDragItemAtPosition(int column, int row);
