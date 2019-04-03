@@ -201,7 +201,7 @@ public class BoardFragment extends Fragment {
 
     private void addColumn() {
         final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
-        int addItems = 15;
+        int addItems =30;
         for (int i = 0; i < addItems; i++) {
             long id = sCreatedItems++;
             if (i == 0 || i == 7) {
