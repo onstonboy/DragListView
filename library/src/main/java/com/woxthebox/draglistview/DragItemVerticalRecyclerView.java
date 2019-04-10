@@ -447,7 +447,7 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
         if (mDragState == DragState.DRAG_ENDED) {
             return;
         }
-
+        mDragState = DragState.DRAG_ENDED;
         mAutoScroller.stopAutoScroll();
         setEnabled(false);
 

@@ -42,7 +42,7 @@ import java.util.ArrayList;
 
 import static android.support.v7.widget.RecyclerView.NO_POSITION;
 
-public class BoardViewVertical extends ScrollView implements AutoScroller.AutoScrollListener {
+public class BoardViewVertical extends LinearLayout implements AutoScroller.AutoScrollListener {
 
     public interface BoardCallback {
         boolean canDragItemAtPosition(int column, int row);
