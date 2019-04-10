@@ -79,10 +79,7 @@ public class BoardFragment extends Fragment {
 
             @Override
             public void onItemDragEnded(int fromColumn, int fromRow, int toColumn, int toRow) {
-                if (fromColumn != toColumn || fromRow != toRow) {
-                    //Toast.makeText(getContext(), "End - column: " + toColumn + " row: " +
-                    // toRow, Toast.LENGTH_SHORT).show();
-                }
+                mBoardView.moveItem(toColumn, toRow, fromColumn, fromRow, true);
             }
 
             @Override
