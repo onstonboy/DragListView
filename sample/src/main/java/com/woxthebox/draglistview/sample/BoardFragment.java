@@ -110,6 +110,14 @@ public class BoardFragment extends Fragment {
             }
 
             @Override
+            public void onItemChangingToChild(int position, int currentColumn) {
+            }
+
+            @Override
+            public void onItemChangingToParent(int position, int currentColumn) {
+            }
+
+            @Override
             public void onFocusedColumnChanged(int oldColumn, int newColumn) {
                 //Toast.makeText(getContext(), "Focused column changed from " + oldColumn + " to
                 // " + newColumn, Toast.LENGTH_SHORT).show();
@@ -198,7 +206,7 @@ public class BoardFragment extends Fragment {
 
     private void addColumn() {
         final ArrayList<Pair<Long, String>> mItemArray = new ArrayList<>();
-        int addItems =30;
+        int addItems = 30;
         for (int i = 0; i < addItems; i++) {
             long id = sCreatedItems++;
             if (i == 0 || i == 7) {

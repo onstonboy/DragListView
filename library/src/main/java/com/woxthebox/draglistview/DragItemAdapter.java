@@ -133,8 +133,6 @@ public abstract class DragItemAdapter<T, VH extends RecyclerView.ViewHolder>
         long itemId = getItemId(position);
         if (holder instanceof ViewHolder) {
             ((ViewHolder) holder).mItemId = itemId;
-            ((ViewHolder) holder).itemView.setVisibility(
-                    mDragItemId == itemId ? View.INVISIBLE : View.VISIBLE);
             ((ViewHolder) holder).setDragStartCallback(mDragStartCallback);
         }
     }

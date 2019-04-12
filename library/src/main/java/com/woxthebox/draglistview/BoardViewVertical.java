@@ -63,6 +63,10 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
 
         void onItemChangeToParent(int position, int currentColumn);
 
+        void onItemChangingToChild(int position, int currentColumn);
+
+        void onItemChangingToParent(int position, int currentColumn);
+
         void onFocusedColumnChanged(int oldColumn, int newColumn);
 
         void onColumnDragStarted(int position);
@@ -95,6 +99,16 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
 
         @Override
         public void onItemChangeToParent(int position, int currentColumn) {
+        }
+
+        @Override
+        public void onItemChangingToChild(int position, int currentColumn) {
+
+        }
+
+        @Override
+        public void onItemChangingToParent(int position, int currentColumn) {
+
         }
 
         @Override
@@ -969,6 +983,16 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
                     @Override
                     public void onDragToParentTask(int itemPosition) {
                         mBoardListener.onItemChangeToParent(itemPosition, mCurrentColumn);
+                    }
+
+                    @Override
+                    public void onDraggingToChildTask(int itemPosition) {
+                        mBoardListener.onItemChangingToChild(itemPosition, mCurrentColumn);
+                    }
+
+                    @Override
+                    public void onDraggingToParentTask(int itemPosition) {
+                        mBoardListener.onItemChangingToParent(itemPosition, mCurrentColumn);
                     }
                 });
 
