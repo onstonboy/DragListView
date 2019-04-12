@@ -50,6 +50,10 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
         void onDragToChildTask(int itemPosition);
 
         void onDragToParentTask(int itemPosition);
+
+        void onDraggingToChildTask(int itemPosition);
+
+        void onDraggingToParentTask(int itemPosition);
     }
 
     private enum DragState {
@@ -440,6 +444,11 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
             mListener.onDragging(mDragItemPosition, x, y);
         }
         invalidate();
+        if (mDragItem.getDragItemView().getX() > mDragItem.getRealDragView().getWidth() / 6) {
+            mDragItemToChildItemListener.onDraggingToChildTask(mDragItemPosition);
+        } else {
+            mDragItemToChildItemListener.onDraggingToParentTask(mDragItemPosition);
+        }
     }
 
     void onDragEnded() {
