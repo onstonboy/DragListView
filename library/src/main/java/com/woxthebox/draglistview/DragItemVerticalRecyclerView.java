@@ -65,7 +65,7 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
     private DragItemCallback mDragCallback;
     private DragItemToChildItemListener mDragItemToChildItemListener;
     private DragState mDragState = DragState.DRAG_ENDED;
-    private DragItemAdapter mAdapter;
+    private DragItemVerticalAdapter mAdapter;
     private DragItemVertical mDragItem;
     private Drawable mDropTargetBackgroundDrawable;
     private Drawable mDropTargetForegroundDrawable;
@@ -221,8 +221,8 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
     @Override
     public void setAdapter(Adapter adapter) {
         if (!isInEditMode()) {
-            if (!(adapter instanceof DragItemAdapter)) {
-                throw new RuntimeException("Adapter must extend DragItemAdapter");
+            if (!(adapter instanceof DragItemVerticalAdapter)) {
+                throw new RuntimeException("Adapter must extend DragItemVerticalAdapter");
             }
             if (!adapter.hasStableIds()) {
                 throw new RuntimeException("Adapter must have stable ids");
@@ -230,7 +230,7 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
         }
 
         super.setAdapter(adapter);
-        mAdapter = (DragItemAdapter) adapter;
+        mAdapter = (DragItemVerticalAdapter) adapter;
     }
 
     @Override
