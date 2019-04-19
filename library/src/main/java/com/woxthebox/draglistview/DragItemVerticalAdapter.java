@@ -24,7 +24,7 @@ import android.view.View;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class DragItemAdapter<T, VH extends RecyclerView.ViewHolder>
+public abstract class DragItemVerticalAdapter<T, VH extends RecyclerView.ViewHolder>
         extends RecyclerView.Adapter<VH> {
 
     interface DragStartCallback {
@@ -43,7 +43,7 @@ public abstract class DragItemAdapter<T, VH extends RecyclerView.ViewHolder>
      */
     public abstract long getUniqueItemId(int position);
 
-    public DragItemAdapter() {
+    public DragItemVerticalAdapter() {
         setHasStableIds(true);
     }
 
@@ -133,8 +133,6 @@ public abstract class DragItemAdapter<T, VH extends RecyclerView.ViewHolder>
         long itemId = getItemId(position);
         if (holder instanceof ViewHolder) {
             ((ViewHolder) holder).mItemId = itemId;
-            ((ViewHolder) holder).itemView.setVisibility(
-                    mDragItemId == itemId ? View.INVISIBLE : View.VISIBLE);
             ((ViewHolder) holder).setDragStartCallback(mDragStartCallback);
         }
     }

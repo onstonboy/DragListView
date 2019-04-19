@@ -518,9 +518,9 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
         return null;
     }
 
-    public DragItemAdapter getAdapter(int column) {
+    public DragItemVerticalAdapter getAdapter(int column) {
         if (column >= 0 && column < mLists.size()) {
-            return (DragItemAdapter) mLists.get(column).getAdapter();
+            return (DragItemVerticalAdapter) mLists.get(column).getAdapter();
         }
         return null;
     }
@@ -562,12 +562,12 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
     }
 
     public void removeItem(int column, int row) {
-        DragItemAdapter adapter = (DragItemAdapter) mLists.get(column).getAdapter();
+        DragItemVerticalAdapter adapter = (DragItemVerticalAdapter) mLists.get(column).getAdapter();
         adapter.removeItem(row);
     }
 
     public void addItem(int column, int row, Object item, boolean scrollToItem) {
-        DragItemAdapter adapter = (DragItemAdapter) mLists.get(column).getAdapter();
+        DragItemVerticalAdapter adapter = (DragItemVerticalAdapter) mLists.get(column).getAdapter();
         adapter.addItem(row, item);
         if (scrollToItem) {
             scrollToItem(column, row, false);
@@ -581,9 +581,9 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
                 && mLists.get(fromColumn).getAdapter().getItemCount() > fromRow
                 && mLists.size() > toColumn
                 && mLists.get(toColumn).getAdapter().getItemCount() >= toRow) {
-            DragItemAdapter adapter = (DragItemAdapter) mLists.get(fromColumn).getAdapter();
+            DragItemVerticalAdapter adapter = (DragItemVerticalAdapter) mLists.get(fromColumn).getAdapter();
             Object item = adapter.removeItem(fromRow);
-            adapter = (DragItemAdapter) mLists.get(toColumn).getAdapter();
+            adapter = (DragItemVerticalAdapter) mLists.get(toColumn).getAdapter();
             adapter.addItem(toRow, item);
             if (scrollToItem) {
                 scrollToItem(toColumn, toRow, false);
@@ -609,7 +609,7 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
         if (!isDragging()
                 && mLists.size() > column
                 && mLists.get(column).getAdapter().getItemCount() > row) {
-            DragItemAdapter adapter = (DragItemAdapter) mLists.get(column).getAdapter();
+            DragItemVerticalAdapter adapter = (DragItemVerticalAdapter) mLists.get(column).getAdapter();
             adapter.removeItem(row);
             adapter.addItem(row, item);
             if (scrollToItem) {
@@ -864,7 +864,7 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
      * @param hasFixedItemSize If the items will have a fixed or dynamic size.
      * @return The created DragItemRecyclerView.
      */
-    public DragItemVerticalRecyclerView insertColumn(final DragItemAdapter adapter, int index,
+    public DragItemVerticalRecyclerView insertColumn(final DragItemVerticalAdapter adapter, int index,
             final @Nullable View header, @Nullable View columnDragView, boolean hasFixedItemSize) {
         final DragItemVerticalRecyclerView recyclerView =
                 insertColumn(adapter, index, header, hasFixedItemSize);
@@ -881,7 +881,7 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
      * @param hasFixedItemSize If the items will have a fixed or dynamic size.
      * @return The created DragItemRecyclerView.
      */
-    public DragItemVerticalRecyclerView addColumn(final DragItemAdapter adapter,
+    public DragItemVerticalRecyclerView addColumn(final DragItemVerticalAdapter adapter,
             final @Nullable View header, @Nullable View columnDragView, boolean hasFixedItemSize) {
         final DragItemVerticalRecyclerView recyclerView =
                 insertColumn(adapter, getColumnCount(), header, hasFixedItemSize);
@@ -902,7 +902,7 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
         }
     }
 
-    private DragItemVerticalRecyclerView insertColumn(final DragItemAdapter adapter, int index,
+    private DragItemVerticalRecyclerView insertColumn(final DragItemVerticalAdapter adapter, int index,
             final @Nullable View header, boolean hasFixedItemSize) {
         if (index > getColumnCount()) {
             throw new IllegalArgumentException("Index is out of bounds");
@@ -998,7 +998,7 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
 
         recyclerView.setAdapter(adapter);
         recyclerView.setDragEnabled(mDragEnabled);
-        adapter.setDragStartedListener(new DragItemAdapter.DragStartCallback() {
+        adapter.setDragStartedListener(new DragItemVerticalAdapter.DragStartCallback() {
             @Override
             public boolean startDrag(View itemView, long itemId) {
                 return recyclerView.startDrag(itemView, itemId,

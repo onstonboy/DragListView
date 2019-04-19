@@ -37,6 +37,7 @@ import android.widget.Toast;
 
 import com.woxthebox.draglistview.DragItem;
 import com.woxthebox.draglistview.DragListView;
+import com.woxthebox.draglistview.DragListViewVertical;
 import com.woxthebox.draglistview.swipe.ListSwipeHelper;
 import com.woxthebox.draglistview.swipe.ListSwipeItem;
 
@@ -45,7 +46,7 @@ import java.util.ArrayList;
 public class ListFragment extends Fragment {
 
     private ArrayList<Pair<Long, String>> mItemArray;
-    private DragListView mDragListView;
+    private DragListViewVertical mDragListView;
     private ListSwipeHelper mSwipeHelper;
     private MySwipeRefreshLayout mRefreshLayout;
 
@@ -63,9 +64,9 @@ public class ListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.list_layout, container, false);
         mRefreshLayout = (MySwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
-        mDragListView = (DragListView) view.findViewById(R.id.drag_list_view);
+        mDragListView = (DragListViewVertical) view.findViewById(R.id.drag_list_view);
         mDragListView.getRecyclerView().setVerticalScrollBarEnabled(true);
-        mDragListView.setDragListListener(new DragListView.DragListListenerAdapter() {
+        mDragListView.setDragListListener(new DragListViewVertical.DragListListenerAdapter() {
             @Override
             public void onItemDragStarted(int position) {
                 mRefreshLayout.setEnabled(false);

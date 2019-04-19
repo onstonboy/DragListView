@@ -26,10 +26,11 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.woxthebox.draglistview.DragItemAdapter;
+import com.woxthebox.draglistview.DragItemVertical;
+import com.woxthebox.draglistview.DragItemVerticalAdapter;
 import java.util.ArrayList;
 
-class ItemAdapter extends DragItemAdapter<Pair<Long, String>, RecyclerView.ViewHolder> {
+class ItemAdapter extends DragItemVerticalAdapter<Pair<Long, String>, RecyclerView.ViewHolder> {
     private static int ITEM1 = 0;
     private static int ITEM2 = 1;
 
@@ -113,7 +114,7 @@ class ItemAdapter extends DragItemAdapter<Pair<Long, String>, RecyclerView.ViewH
         }
     }
 
-    class ViewHolder extends DragItemAdapter.ViewHolder {
+    class ViewHolder extends DragItemVerticalAdapter.ViewHolder {
         Context mContext;
         TextView mText;
         View mContainer;
@@ -137,7 +138,7 @@ class ItemAdapter extends DragItemAdapter<Pair<Long, String>, RecyclerView.ViewH
         }
     }
 
-    class ViewHolder2 extends DragItemAdapter.ViewHolder {
+    class ViewHolder2 extends DragItemVerticalAdapter.ViewHolder {
         Context mContext;
         TextView mText;
         View mContainer;
