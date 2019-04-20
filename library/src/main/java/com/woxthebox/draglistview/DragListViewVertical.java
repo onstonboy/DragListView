@@ -69,17 +69,17 @@ public class DragListViewVertical extends FrameLayout {
         }
     }
 
-    private DragItemRecyclerView mRecyclerView;
+    private DragItemVerticalRecyclerView mRecyclerView;
     private DragListListener mDragListListener;
     private DragListCallback mDragListCallback;
-    private DragItem mDragItem;
+    private DragItemVertical mDragItem;
     private ListSwipeHelper mSwipeHelper;
     private float mTouchX;
     private float mTouchY;
 
     public DragListViewVertical(Context context) {
         super(context);
-        mDragItem = new DragItem(getContext());
+        mDragItem = new DragItemVertical(getContext());
         mRecyclerView = createRecyclerView();
         mRecyclerView.setDragItem(mDragItem);
         addView(mRecyclerView);
@@ -97,7 +97,7 @@ public class DragListViewVertical extends FrameLayout {
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        mDragItem = new DragItem(getContext());
+        mDragItem = new DragItemVertical(getContext());
         mRecyclerView = createRecyclerView();
         mRecyclerView.setDragItem(mDragItem);
         addView(mRecyclerView);
@@ -134,13 +134,13 @@ public class DragListViewVertical extends FrameLayout {
         return false;
     }
 
-    private DragItemRecyclerView createRecyclerView() {
-        final DragItemRecyclerView recyclerView = (DragItemRecyclerView) LayoutInflater.from(getContext()).inflate(R.layout.drag_item_recycler_view, this, false);
+    private DragItemVerticalRecyclerView createRecyclerView() {
+        final DragItemVerticalRecyclerView recyclerView = (DragItemVerticalRecyclerView) LayoutInflater.from(getContext()).inflate(R.layout.drag_item_recycler_view, this, false);
         recyclerView.setMotionEventSplittingEnabled(false);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setVerticalScrollBarEnabled(false);
         recyclerView.setHorizontalScrollBarEnabled(false);
-        recyclerView.setDragItemListener(new DragItemRecyclerView.DragItemListener() {
+        recyclerView.setDragItemListener(new DragItemVerticalRecyclerView.DragItemListener() {
             private int mDragStartPosition;
 
             @Override
@@ -166,7 +166,7 @@ public class DragListViewVertical extends FrameLayout {
                 }
             }
         });
-        recyclerView.setDragItemCallback(new DragItemRecyclerView.DragItemCallback() {
+        recyclerView.setDragItemCallback(new DragItemVerticalRecyclerView.DragItemCallback() {
             @Override
             public boolean canDragItemAtPosition(int dragPosition) {
                 return mDragListCallback == null || mDragListCallback.canDragItemAtPosition(dragPosition);
@@ -252,14 +252,14 @@ public class DragListViewVertical extends FrameLayout {
         mRecyclerView.setDragEnabled(enabled);
     }
 
-    public void setCustomDragItem(DragItem dragItem) {
+    public void setCustomDragItem(DragItemVertical dragItem) {
         removeViewAt(1);
 
-        DragItem newDragItem;
+        DragItemVertical newDragItem;
         if (dragItem != null) {
             newDragItem = dragItem;
         } else {
-            newDragItem = new DragItem(getContext());
+            newDragItem = new DragItemVertical(getContext());
         }
 
         newDragItem.setCanDragHorizontally(mDragItem.canDragHorizontally());
