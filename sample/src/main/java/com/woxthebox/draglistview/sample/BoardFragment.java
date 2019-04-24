@@ -100,16 +100,6 @@ public class BoardFragment extends Fragment {
             }
 
             @Override
-            public void onItemChangeToChild(int position, int currentColumn) {
-                ((ItemAdapter) mBoardView.getAdapter(currentColumn)).updateChildTask(position);
-            }
-
-            @Override
-            public void onItemChangeToParent(int position, int currentColumn) {
-                ((ItemAdapter) mBoardView.getAdapter(currentColumn)).updateParentTask(position);
-            }
-
-            @Override
             public void onItemChangingToChild(int position, int currentColumn) {
             }
 
