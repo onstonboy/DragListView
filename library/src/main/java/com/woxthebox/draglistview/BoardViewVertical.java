@@ -59,10 +59,6 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
 
         void onItemChangedColumn(int oldColumn, int newColumn);
 
-        void onItemChangeToChild(int position, int currentColumn);
-
-        void onItemChangeToParent(int position, int currentColumn);
-
         void onItemChangingToChild(int position, int currentColumn);
 
         void onItemChangingToParent(int position, int currentColumn);
@@ -91,14 +87,6 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
 
         @Override
         public void onItemChangedColumn(int oldColumn, int newColumn) {
-        }
-
-        @Override
-        public void onItemChangeToChild(int position, int currentColumn) {
-        }
-
-        @Override
-        public void onItemChangeToParent(int position, int currentColumn) {
         }
 
         @Override
@@ -576,8 +564,7 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
 
     public void moveItem(int fromColumn, int fromRow, int toColumn, int toRow,
             boolean scrollToItem) {
-        if (!isDragging()
-                && mLists.size() > fromColumn
+        if (mLists.size() > fromColumn
                 && mLists.get(fromColumn).getAdapter().getItemCount() > fromRow
                 && mLists.size() > toColumn
                 && mLists.get(toColumn).getAdapter().getItemCount() >= toRow) {
@@ -975,16 +962,6 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
         });
         recyclerView.setDragItemToChildItemListener(
                 new DragItemVerticalRecyclerView.DragItemToChildItemListener() {
-                    @Override
-                    public void onDragToChildTask(int itemPosition) {
-                        mBoardListener.onItemChangeToChild(itemPosition, mCurrentColumn);
-                    }
-
-                    @Override
-                    public void onDragToParentTask(int itemPosition) {
-                        mBoardListener.onItemChangeToParent(itemPosition, mCurrentColumn);
-                    }
-
                     @Override
                     public void onDraggingToChildTask(int itemPosition) {
                         mBoardListener.onItemChangingToChild(itemPosition, mCurrentColumn);

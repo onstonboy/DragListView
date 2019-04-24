@@ -47,10 +47,6 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
     }
 
     public interface DragItemToChildItemListener {
-        void onDragToChildTask(int itemPosition);
-
-        void onDragToParentTask(int itemPosition);
-
         void onDraggingToChildTask(int itemPosition);
 
         void onDraggingToParentTask(int itemPosition);
@@ -479,11 +475,6 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
                         findViewHolderForAdapterPosition(mDragItemPosition);
                 if (holder != null) {
                     getItemAnimator().endAnimation(holder);
-                    if (mDragItem.getDragItemView().getX() > mDragItem.getRealDragView().getWidth() / 6) {
-                        mDragItemToChildItemListener.onDragToChildTask(mDragItemPosition);
-                    } else {
-                        mDragItemToChildItemListener.onDragToParentTask(mDragItemPosition);
-                    }
                     mDragItem.endDrag(holder.itemView, new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {
