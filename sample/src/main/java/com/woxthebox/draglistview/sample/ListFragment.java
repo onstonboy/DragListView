@@ -36,6 +36,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.woxthebox.draglistview.DragItem;
+import com.woxthebox.draglistview.DragItemVertical;
 import com.woxthebox.draglistview.DragListView;
 import com.woxthebox.draglistview.DragListViewVertical;
 import com.woxthebox.draglistview.swipe.ListSwipeHelper;
@@ -192,7 +193,7 @@ public class ListFragment extends Fragment {
         mDragListView.setCustomDragItem(null);
     }
 
-    private static class MyDragItem extends DragItem {
+    private static class MyDragItem extends DragItemVertical {
 
         MyDragItem(Context context, int layoutId) {
             super(context, layoutId);
