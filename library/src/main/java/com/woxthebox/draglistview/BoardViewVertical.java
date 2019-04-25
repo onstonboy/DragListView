@@ -674,9 +674,15 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
         }
     }
 
-    public void itemDraggingChanged() {
-        mItemDraggingChanged = true;
-        mCurrentRecyclerView.itemDraggingChanged();
+    public void itemDraggingChanged(boolean isItemDraggingChange) {
+        mItemDraggingChanged = isItemDraggingChange;
+        if (mCurrentRecyclerView != null) {
+            mCurrentRecyclerView.itemDraggingChanged(isItemDraggingChange);
+        }
+    }
+
+    public boolean isItemDraggingChanged() {
+        return mItemDraggingChanged;
     }
 
     public boolean isDragEnabled() {
@@ -938,7 +944,6 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
             public void onDragEnded(int newItemPosition) {
                 mLastDragColumn = NO_POSITION;
                 mLastDragRow = NO_POSITION;
-                mItemDraggingChanged = false;
                 if (mBoardListener != null) {
                     mBoardListener.onItemDragEnded(mDragStartColumn, mDragStartRow,
                             getColumnOfList(recyclerView), newItemPosition);
