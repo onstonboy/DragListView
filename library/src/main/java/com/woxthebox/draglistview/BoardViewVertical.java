@@ -674,9 +674,9 @@ public class BoardViewVertical extends LinearLayout implements AutoScroller.Auto
         }
     }
 
-    public void itemDraggingChanged() {
-        mItemDraggingChanged = true;
-        mCurrentRecyclerView.itemDraggingChanged();
+    public void itemDraggingChanged(boolean isItemDraggingChange) {
+        mItemDraggingChanged = isItemDraggingChange;
+        mCurrentRecyclerView.itemDraggingChanged(isItemDraggingChange);
     }
 
     public boolean isDragEnabled() {
