@@ -151,8 +151,8 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
         return super.onInterceptTouchEvent(event);
     }
 
-    public void itemDraggingChanged() {
-        mItemDraggingChanged = true;
+    public void itemDraggingChanged(boolean isItemDraggingChange) {
+        mItemDraggingChanged = isItemDraggingChange;
     }
 
     void setDragEnabled(boolean enabled) {
