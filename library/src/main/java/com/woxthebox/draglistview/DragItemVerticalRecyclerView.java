@@ -151,8 +151,8 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
         return super.onInterceptTouchEvent(event);
     }
 
-    public void itemDraggingChanged() {
-        mItemDraggingChanged = true;
+    public void itemDraggingChanged(boolean isItemDraggingChange) {
+        mItemDraggingChanged = isItemDraggingChange;
     }
 
     void setDragEnabled(boolean enabled) {
@@ -496,7 +496,6 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
         if (mItemDraggingChanged) {
             mAdapter.removeItem(mItemDragging);
         }
-        mItemDraggingChanged = false;
         mAdapter.setDragItemId(NO_ID);
         mAdapter.setDropTargetId(NO_ID);
         mAdapter.notifyDataSetChanged();
