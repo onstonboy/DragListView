@@ -38,7 +38,6 @@ import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.Scroller;
-
 import java.util.ArrayList;
 
 import static android.support.v7.widget.RecyclerView.NO_POSITION;
@@ -137,6 +136,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     private int mLastDragRow = NO_POSITION;
     private SavedState mSavedState;
     private boolean mItemDraggingChanged;
+    private boolean mIsFullScreen = true;
 
     public BoardView(Context context) {
         super(context);
@@ -156,7 +156,11 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
         Resources res = getResources();
         boolean isPortrait = res.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         if (isPortrait) {
-            mColumnWidth = (int) (res.getDisplayMetrics().widthPixels * 0.87);
+            if (mIsFullScreen) {
+                mColumnWidth = res.getDisplayMetrics().widthPixels;
+            } else {
+                mColumnWidth = (int) (res.getDisplayMetrics().widthPixels * 0.87);
+            }
         } else {
             mColumnWidth = (int) (res.getDisplayMetrics().density * 320);
         }
@@ -164,8 +168,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
         mGestureDetector = new GestureDetector(getContext(), new GestureListener());
         mScroller = new Scroller(getContext(), new DecelerateInterpolator(1.1f));
         mAutoScroller = new AutoScroller(getContext(), this);
-        mAutoScroller.setAutoScrollMode(snapToColumnWhenDragging() ? AutoScroller.AutoScrollMode.COLUMN : AutoScroller.AutoScrollMode
-                .POSITION);
+        mAutoScroller.setAutoScrollMode(snapToColumnWhenDragging() ? AutoScroller.AutoScrollMode.COLUMN : AutoScroller.AutoScrollMode.POSITION);
         mDragItem = new DragItem(getContext());
         mDragColumn = new DragItem(getContext());
         mDragColumn.setSnapToTouch(false);
@@ -294,7 +297,8 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
                 if (isDraggingColumn()) {
                     mDragColumn.setPosition(mTouchX + getScrollX() - mDragColumnStartScrollX, mTouchY);
                 } else {
-                    mDragItem.setPosition(getRelativeViewTouchX((View) mCurrentRecyclerView.getParent()), getRelativeViewTouchY(mCurrentRecyclerView));
+                    mDragItem.setPosition(getRelativeViewTouchX((View) mCurrentRecyclerView.getParent()),
+                            getRelativeViewTouchY(mCurrentRecyclerView));
                 }
             }
 
@@ -360,7 +364,8 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
             }
 
             // Updated event to list coordinates
-            mCurrentRecyclerView.onDragging(getRelativeViewTouchX((View) mCurrentRecyclerView.getParent()), getRelativeViewTouchY(mCurrentRecyclerView));
+            mCurrentRecyclerView.onDragging(getRelativeViewTouchX((View) mCurrentRecyclerView.getParent()),
+                    getRelativeViewTouchY(mCurrentRecyclerView));
         }
 
         boolean isPortrait = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
@@ -526,8 +531,11 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     }
 
     public void moveItem(int fromColumn, int fromRow, int toColumn, int toRow, boolean scrollToItem) {
-        if (!isDragging() && mLists.size() > fromColumn && mLists.get(fromColumn).getAdapter().getItemCount() > fromRow
-                && mLists.size() > toColumn && mLists.get(toColumn).getAdapter().getItemCount() >= toRow) {
+        if (!isDragging()
+                && mLists.size() > fromColumn
+                && mLists.get(fromColumn).getAdapter().getItemCount() > fromRow
+                && mLists.size() > toColumn
+                && mLists.get(toColumn).getAdapter().getItemCount() >= toRow) {
             DragItemAdapter adapter = (DragItemAdapter) mLists.get(fromColumn).getAdapter();
             Object item = adapter.removeItem(fromRow);
             adapter = (DragItemAdapter) mLists.get(toColumn).getAdapter();
@@ -649,6 +657,10 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
         }
     }
 
+    public void isColumnFullScreen(boolean isFullScreen) {
+        mIsFullScreen = isFullScreen;
+    }
+
     /**
      * @return The index of the currently focused column. If column snapping is not enabled this will always return 0.
      */
@@ -661,7 +673,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
 
     /**
      * @param width the width of columns in both portrait and landscape. This must be called before {@link #addColumn} is
-     *              called for the width to take effect.
+     * called for the width to take effect.
      */
     public void setColumnWidth(int width) {
         mColumnWidth = width;
@@ -679,8 +691,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
      */
     public void setSnapToColumnWhenDragging(boolean snapToColumn) {
         mSnapToColumnWhenDragging = snapToColumn;
-        mAutoScroller.setAutoScrollMode(snapToColumnWhenDragging() ? AutoScroller.AutoScrollMode.COLUMN : AutoScroller.AutoScrollMode
-                .POSITION);
+        mAutoScroller.setAutoScrollMode(snapToColumnWhenDragging() ? AutoScroller.AutoScrollMode.COLUMN : AutoScroller.AutoScrollMode.POSITION);
     }
 
     /**
@@ -688,8 +699,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
      */
     public void setSnapToColumnInLandscape(boolean snapToColumnInLandscape) {
         mSnapToColumnInLandscape = snapToColumnInLandscape;
-        mAutoScroller.setAutoScrollMode(snapToColumnWhenDragging() ? AutoScroller.AutoScrollMode.COLUMN : AutoScroller.AutoScrollMode
-                .POSITION);
+        mAutoScroller.setAutoScrollMode(snapToColumnWhenDragging() ? AutoScroller.AutoScrollMode.COLUMN : AutoScroller.AutoScrollMode.POSITION);
     }
 
     /**
@@ -790,15 +800,15 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     /**
      * Inserts a column to the board at a specific index.
      *
-     * @param adapter          Adapter with the items for the column.
-     * @param index            Index where on the board to add the column.
-     * @param header           Header view that will be positioned above the column. Can be null.
-     * @param columnDragView   View that will act as handle to drag and drop columns. Can be null.
+     * @param adapter Adapter with the items for the column.
+     * @param index Index where on the board to add the column.
+     * @param header Header view that will be positioned above the column. Can be null.
+     * @param columnDragView View that will act as handle to drag and drop columns. Can be null.
      * @param hasFixedItemSize If the items will have a fixed or dynamic size.
-     *
      * @return The created DragItemRecyclerView.
      */
-    public DragItemRecyclerView insertColumn(final DragItemAdapter adapter, int index, final @Nullable View header, @Nullable View columnDragView, boolean hasFixedItemSize) {
+    public DragItemRecyclerView insertColumn(final DragItemAdapter adapter, int index, final @Nullable View header, @Nullable View columnDragView,
+            boolean hasFixedItemSize) {
         final DragItemRecyclerView recyclerView = insertColumn(adapter, index, header, hasFixedItemSize);
         setupColumnDragListener(columnDragView, recyclerView);
         return recyclerView;
@@ -807,20 +817,20 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     /**
      * Adds a column at the last index of the board.
      *
-     * @param adapter          Adapter with the items for the column.
-     * @param header           Header view that will be positioned above the column. Can be null.
-     * @param columnDragView   View that will act as handle to drag and drop columns. Can be null.
+     * @param adapter Adapter with the items for the column.
+     * @param header Header view that will be positioned above the column. Can be null.
+     * @param columnDragView View that will act as handle to drag and drop columns. Can be null.
      * @param hasFixedItemSize If the items will have a fixed or dynamic size.
-     *
      * @return The created DragItemRecyclerView.
      */
-    public DragItemRecyclerView addColumn(final DragItemAdapter adapter, final @Nullable View header, @Nullable View columnDragView, boolean hasFixedItemSize) {
+    public DragItemRecyclerView addColumn(final DragItemAdapter adapter, final @Nullable View header, @Nullable View columnDragView,
+            boolean hasFixedItemSize) {
         final DragItemRecyclerView recyclerView = insertColumn(adapter, getColumnCount(), header, hasFixedItemSize);
         setupColumnDragListener(columnDragView, recyclerView);
         return recyclerView;
     }
 
-    private void setupColumnDragListener(View columnDragView, final DragItemRecyclerView recyclerView ) {
+    private void setupColumnDragListener(View columnDragView, final DragItemRecyclerView recyclerView) {
         if (columnDragView != null) {
             columnDragView.setOnLongClickListener(new OnLongClickListener() {
                 @Override
@@ -837,13 +847,14 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
             throw new IllegalArgumentException("Index is out of bounds");
         }
 
-        final DragItemRecyclerView recyclerView = (DragItemRecyclerView) LayoutInflater.from(getContext()).inflate(R.layout.drag_item_recycler_view, this, false);
+        final DragItemRecyclerView recyclerView =
+                (DragItemRecyclerView) LayoutInflater.from(getContext()).inflate(R.layout.drag_item_recycler_view, this, false);
         recyclerView.setId(getColumnCount());
         recyclerView.setHorizontalScrollBarEnabled(false);
         recyclerView.setVerticalScrollBarEnabled(false);
         recyclerView.setMotionEventSplittingEnabled(false);
         recyclerView.setDragItem(mDragItem);
-        recyclerView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        recyclerView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(hasFixedItemSize);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -900,7 +911,8 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
         adapter.setDragStartedListener(new DragItemAdapter.DragStartCallback() {
             @Override
             public boolean startDrag(View itemView, long itemId) {
-                return recyclerView.startDrag(itemView, itemId, getRelativeViewTouchX((View) recyclerView.getParent()), getRelativeViewTouchY(recyclerView));
+                return recyclerView.startDrag(itemView, itemId, getRelativeViewTouchX((View) recyclerView.getParent()),
+                        getRelativeViewTouchY(recyclerView));
             }
 
             @Override
