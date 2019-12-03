@@ -25,6 +25,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -45,6 +46,12 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
         boolean canDropItemAtPosition(int dropPosition);
     }
 
+    public interface DragItemToChildItemListener {
+        void onDraggingToChildTask(int itemPosition);
+
+        void onDraggingToParentTask(int itemPosition);
+    }
+
     private enum DragState {
         DRAG_STARTED, DRAGGING, DRAG_ENDED
     }
@@ -52,8 +59,9 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
     private AutoScroller mAutoScroller;
     private DragItemListener mListener;
     private DragItemCallback mDragCallback;
+    private DragItemToChildItemListener mDragItemToChildItemListener;
     private DragState mDragState = DragState.DRAG_ENDED;
-    private DragItemAdapter mAdapter;
+    private DragItemVerticalAdapter mAdapter;
     private DragItemVertical mDragItem;
     private Drawable mDropTargetBackgroundDrawable;
     private Drawable mDropTargetForegroundDrawable;
@@ -184,6 +192,10 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
         mDragCallback = callback;
     }
 
+    void setDragItemToChildItemListener(DragItemToChildItemListener dragItemToChildItemListener) {
+        mDragItemToChildItemListener = dragItemToChildItemListener;
+    }
+
     void setDragItem(DragItemVertical dragItem) {
         mDragItem = dragItem;
     }
@@ -205,8 +217,8 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
     @Override
     public void setAdapter(Adapter adapter) {
         if (!isInEditMode()) {
-            if (!(adapter instanceof DragItemAdapter)) {
-                throw new RuntimeException("Adapter must extend DragItemAdapter");
+            if (!(adapter instanceof DragItemVerticalAdapter)) {
+                throw new RuntimeException("Adapter must extend DragItemVerticalAdapter");
             }
             if (!adapter.hasStableIds()) {
                 throw new RuntimeException("Adapter must have stable ids");
@@ -214,7 +226,7 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
         }
 
         super.setAdapter(adapter);
-        mAdapter = (DragItemAdapter) adapter;
+        mAdapter = (DragItemVerticalAdapter) adapter;
     }
 
     @Override
@@ -428,6 +440,11 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
             mListener.onDragging(mDragItemPosition, x, y);
         }
         invalidate();
+        if (mDragItem.getDragItemView().getX() > mDragItem.getRealDragView().getWidth() / 6) {
+            mDragItemToChildItemListener.onDraggingToChildTask(mDragItemPosition);
+        } else {
+            mDragItemToChildItemListener.onDraggingToParentTask(mDragItemPosition);
+        }
     }
 
     void onDragEnded() {
@@ -435,7 +452,7 @@ public class DragItemVerticalRecyclerView extends RecyclerView implements AutoSc
         if (mDragState == DragState.DRAG_ENDED) {
             return;
         }
-
+        mDragState = DragState.DRAG_ENDED;
         mAutoScroller.stopAutoScroll();
         setEnabled(false);
 

@@ -435,7 +435,7 @@ public class DragItemRecyclerView extends RecyclerView implements AutoScroller.A
         if (mDragState == DragState.DRAG_ENDED) {
             return;
         }
-
+        mDragState = DragState.DRAG_ENDED;
         mAutoScroller.stopAutoScroll();
         setEnabled(false);
 
