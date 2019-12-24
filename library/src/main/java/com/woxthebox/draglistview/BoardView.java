@@ -531,8 +531,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     }
 
     public void moveItem(int fromColumn, int fromRow, int toColumn, int toRow, boolean scrollToItem) {
-        if (!isDragging()
-                && mLists.size() > fromColumn
+        if (mLists.size() > fromColumn
                 && mLists.get(fromColumn).getAdapter().getItemCount() > fromRow
                 && mLists.size() > toColumn
                 && mLists.get(toColumn).getAdapter().getItemCount() >= toRow) {
@@ -561,7 +560,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     }
 
     public void replaceItem(int column, int row, Object item, boolean scrollToItem) {
-        if (!isDragging() && mLists.size() > column && mLists.get(column).getAdapter().getItemCount() > row) {
+        if (mLists.size() > column && mLists.get(column).getAdapter().getItemCount() > row) {
             DragItemAdapter adapter = (DragItemAdapter) mLists.get(column).getAdapter();
             adapter.removeItem(row);
             adapter.addItem(row, item);
