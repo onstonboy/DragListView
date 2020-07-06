@@ -25,7 +25,8 @@ import android.view.View;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class DragItemAdapter<T, VH extends DragItemAdapter.ViewHolder> extends RecyclerView.Adapter<VH> {
+public abstract class DragItemAdapter<T, VH extends RecyclerView.ViewHolder>
+        extends RecyclerView.Adapter<VH> {
 
     interface DragStartCallback {
         boolean startDrag(View itemView, long itemId);
@@ -131,15 +132,20 @@ public abstract class DragItemAdapter<T, VH extends DragItemAdapter.ViewHolder> 
     @Override
     public void onBindViewHolder(@NonNull VH holder, int position) {
         long itemId = getItemId(position);
-        holder.mItemId = itemId;
-        holder.itemView.setVisibility(mDragItemId == itemId ? View.INVISIBLE : View.VISIBLE);
-        holder.setDragStartCallback(mDragStartCallback);
+        if (holder instanceof ViewHolder) {
+            ((ViewHolder) holder).mItemId = itemId;
+            ((ViewHolder) holder).itemView.setVisibility(
+                    mDragItemId == itemId ? View.INVISIBLE : View.VISIBLE);
+            ((ViewHolder) holder).setDragStartCallback(mDragStartCallback);
+        }
     }
 
     @Override
     public void onViewRecycled(@NonNull VH holder) {
         super.onViewRecycled(holder);
-        holder.setDragStartCallback(null);
+        if (holder instanceof ViewHolder) {
+            ((ViewHolder) holder).setDragStartCallback(null);
+        }
     }
 
     void setDragStartedListener(DragStartCallback dragStartedListener) {
