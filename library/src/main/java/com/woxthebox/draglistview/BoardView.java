@@ -60,6 +60,10 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
 
         void onItemDragEnded(int fromColumn, int fromRow, int toColumn, int toRow);
 
+        void onItemChangingToChild(int position, int currentColumn);
+
+        void onItemChangingToParent(int position, int currentColumn);
+
         void onItemChangedPosition(int oldColumn, int oldRow, int newColumn, int newRow);
 
         void onItemChangedColumn(int oldColumn, int newColumn);
@@ -142,6 +146,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     private int mLastDragColumn = NO_POSITION;
     private int mLastDragRow = NO_POSITION;
     private SavedState mSavedState;
+    private boolean mItemDraggingChanged;
 
     public BoardView(Context context) {
         super(context);
@@ -172,7 +177,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
         Resources res = getResources();
         boolean isPortrait = res.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT;
         if (isPortrait) {
-            mColumnWidth = (int) (res.getDisplayMetrics().widthPixels * 0.87);
+            mColumnWidth = (int) (res.getDisplayMetrics().widthPixels);
         } else {
             mColumnWidth = (int) (res.getDisplayMetrics().density * 320);
         }
@@ -187,11 +192,11 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
         mDragColumn.setSnapToTouch(false);
 
         mRootLayout = new FrameLayout(getContext());
-        mRootLayout.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
+        mRootLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
         mColumnLayout = new LinearLayout(getContext());
         mColumnLayout.setOrientation(LinearLayout.HORIZONTAL);
-        mColumnLayout.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.MATCH_PARENT));
+        mColumnLayout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         mColumnLayout.setMotionEventSplittingEnabled(false);
 
         mRootLayout.addView(mColumnLayout);
@@ -366,7 +371,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
                     Object item = mCurrentRecyclerView.removeDragItemAndEnd();
                     if (item != null) {
                         mCurrentRecyclerView = currentList;
-                        mCurrentRecyclerView.addDragItemAndStart(getRelativeViewTouchY(mCurrentRecyclerView), item, itemId);
+                        mCurrentRecyclerView.addDragItemAndStart(getRelativeViewTouchY(mCurrentRecyclerView), item, itemId, mItemDraggingChanged);
                         mDragItem.setOffset(((View) mCurrentRecyclerView.getParent()).getLeft(), mCurrentRecyclerView.getTop());
 
                         if (mBoardListener != null) {
@@ -547,7 +552,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     }
 
     public void moveItem(int fromColumn, int fromRow, int toColumn, int toRow, boolean scrollToItem) {
-        if (!isDragging() && mLists.size() > fromColumn && mLists.get(fromColumn).getAdapter().getItemCount() > fromRow
+        if (mLists.size() > fromColumn && mLists.get(fromColumn).getAdapter().getItemCount() > fromRow
                 && mLists.size() > toColumn && mLists.get(toColumn).getAdapter().getItemCount() >= toRow) {
             DragItemAdapter adapter = (DragItemAdapter) mLists.get(fromColumn).getAdapter();
             Object item = adapter.removeItem(fromRow);
@@ -574,7 +579,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     }
 
     public void replaceItem(int column, int row, Object item, boolean scrollToItem) {
-        if (!isDragging() && mLists.size() > column && mLists.get(column).getAdapter().getItemCount() > row) {
+        if (mLists.size() > column && mLists.get(column).getAdapter().getItemCount() > row) {
             DragItemAdapter adapter = (DragItemAdapter) mLists.get(column).getAdapter();
             adapter.removeItem(row);
             adapter.addItem(row, item);
@@ -585,7 +590,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
     }
 
     public void scrollToItem(int column, int row, boolean animate) {
-        if (!isDragging() && mLists.size() > column && mLists.get(column).getAdapter().getItemCount() > row) {
+        if (mLists.size() > column && mLists.get(column).getAdapter().getItemCount() > row) {
             mScroller.forceFinished(true);
             scrollToColumn(column, animate);
             if (animate) {
@@ -653,6 +658,11 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
             mLists.remove(column);
             updateBoardSpaces();
         }
+    }
+
+    public void itemDraggingChanged() {
+        mItemDraggingChanged = true;
+        mCurrentRecyclerView.itemDraggingChanged();
     }
 
     public boolean isDragEnabled() {
@@ -921,7 +931,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
         recyclerView.setVerticalScrollBarEnabled(false);
         recyclerView.setMotionEventSplittingEnabled(false);
         recyclerView.setDragItem(mDragItem);
-        recyclerView.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT));
+        recyclerView.setLayoutParams(new LinearLayout.LayoutParams(mColumnWidth, LinearLayout.LayoutParams.MATCH_PARENT));
 
         RecyclerView.LayoutManager layoutManager = columnProperties.getLayoutManager();
         recyclerView.setLayoutManager(layoutManager != null ? layoutManager : new LinearLayoutManager(getContext()));
@@ -962,6 +972,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
             public void onDragEnded(int newItemPosition) {
                 mLastDragColumn = NO_POSITION;
                 mLastDragRow = NO_POSITION;
+                mItemDraggingChanged = false;
                 if (mBoardListener != null) {
                     mBoardListener.onItemDragEnded(mDragStartColumn, mDragStartRow, getColumnOfList(recyclerView), newItemPosition);
                 }
@@ -982,6 +993,20 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
         });
 
         DragItemAdapter adapter = columnProperties.getDragItemAdapter();
+
+        recyclerView.setDragItemToChildItemListener(
+                new DragItemRecyclerView.DragItemToChildItemListener() {
+                    @Override
+                    public void onDraggingToChildTask(int itemPosition) {
+                        mBoardListener.onItemChangingToChild(itemPosition, mCurrentColumn);
+                    }
+
+                    @Override
+                    public void onDraggingToParentTask(int itemPosition) {
+                        mBoardListener.onItemChangingToParent(itemPosition, mCurrentColumn);
+                    }
+                });
+
         adapter.setDragStartedListener(new DragItemAdapter.DragStartCallback() {
             @Override
             public boolean startDrag(View itemView, long itemId) {
@@ -999,7 +1024,7 @@ public class BoardView extends HorizontalScrollView implements AutoScroller.Auto
         LinearLayout layout = new LinearLayout(getContext());
         layout.setBackgroundColor(columnProperties.getColumnBackgroundColor());
         layout.setOrientation(LinearLayout.VERTICAL);
-        layout.setLayoutParams(new LayoutParams(mColumnWidth, LayoutParams.MATCH_PARENT));
+        layout.setLayoutParams(new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 
         View columnHeader = columnProperties.getHeader();
         if (columnHeader == null) {
